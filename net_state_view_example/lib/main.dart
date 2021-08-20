@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:net_state_view/net_state_view.dart';
 
 void main() {
   runApp(MyApp());
@@ -47,6 +48,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  NetStateViewController _nsvController = NetStateViewController();
 
   void _incrementCounter() {
     setState(() {
@@ -56,6 +58,24 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
+      int state = _counter % 4;
+      switch (state) {
+        case 0:
+          _nsvController.doneStateNone();
+          break;
+        case 1:
+          _nsvController.doneStateWaiting();
+          break;
+        case 2:
+          _nsvController.doneStateEmpty();
+          break;
+        case 3:
+          _nsvController.doneStateError();
+          break;
+        case 4:
+          _nsvController.doneStateDone();
+          break;
+      }
     });
   }
 
@@ -100,6 +120,14 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
+            Expanded(
+              child: NetStateView(
+                dataView: Container(
+                  child: Text("有数据布局"),
+                ),
+                controller: _nsvController,
+              ),
+            )
           ],
         ),
       ),
