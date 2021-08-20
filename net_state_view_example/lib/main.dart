@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:net_state_view/net_state_view.dart';
 
@@ -58,25 +60,55 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
-      int state = _counter % 4;
-      switch (state) {
-        case 0:
-          _nsvController.doneStateNone();
-          break;
-        case 1:
-          _nsvController.doneStateWaiting();
-          break;
-        case 2:
-          _nsvController.doneStateEmpty();
-          break;
-        case 3:
-          _nsvController.doneStateError();
-          break;
-        case 4:
-          _nsvController.doneStateDone();
-          break;
-      }
+      // int state = _counter % 5;
+      // switch (state) {
+      //   case 0:
+      //     _nsvController.doneStateNone();
+      //     break;
+      //   case 1:
+      //     _nsvController.doneStateWaiting();
+      //     break;
+      //   case 2:
+      //     _nsvController.doneStateEmpty();
+      //     break;
+      //   case 3:
+      //     _nsvController.doneStateError();
+      //     break;
+      //   case 4:
+      //     _nsvController.doneStateDone();
+      //     break;
+      // }
     });
+    _testFuture();
+  }
+
+  _testFuture() async {
+    _nsvController.doneStateWaiting();
+    Completer c = Completer();
+
+    if (_counter % 2 == 0 && c.isCompleted == false) {
+      await Future.delayed(Duration(seconds: 3), () {
+        return "";
+      });
+      c.completeError('error in ');
+    }
+    if (_counter % 2 == 1 && c.isCompleted == false) {
+      await Future.delayed(Duration(seconds: 3), () {
+        return "";
+      });
+      c.complete('complete in ');
+    }
+
+    c.future.then(
+      (value) {
+        print("value = $value");
+        _nsvController.doneStateDone();
+      },
+    ).onError(
+      (error, stackTrace) {
+        _nsvController.doneStateError();
+      },
+    );
   }
 
   @override
@@ -123,7 +155,9 @@ class _MyHomePageState extends State<MyHomePage> {
             Expanded(
               child: NetStateView(
                 dataView: Container(
-                  child: Text("有数据布局"),
+                  alignment: Alignment.center,
+                  color: Colors.amber,
+                  child: Text("OK KO"),
                 ),
                 controller: _nsvController,
               ),

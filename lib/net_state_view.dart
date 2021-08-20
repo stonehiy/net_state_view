@@ -2,6 +2,9 @@ library net_state_view;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:net_state_view/widgets/def_widget_state.dart';
+
+import 'widgets/iwidget_state.dart';
 
 ///
 ///自定义状态布局
@@ -20,18 +23,16 @@ class NetStateView extends StatefulWidget {
 
   NetStateViewController controller = NetStateViewController.defalut();
 
-  final Widget? noneView;
-  final Widget? waitingView;
-  final Widget? errorView;
-  final Widget? emptyView;
+  // final Widget? noneView;
+  // final Widget? waitingView;
+  // final Widget? errorView;
+  // final Widget? emptyView;
+  final IWidgetState? widgetState;
 
   NetStateView({
     required this.dataView,
     required this.controller,
-    this.noneView,
-    this.waitingView,
-    this.errorView,
-    this.emptyView,
+    this.widgetState,
   });
 
   @override
@@ -81,20 +82,20 @@ class _NetStateViewState extends State<NetStateView> {
   }
 
   _rootView(BuildContext context, Done done) {
-    // Done done = don ?? Done(DoneState.none);
-    var view = widget.noneView ?? _buildEmpty(context);
+    IWidgetState widgetState = widget.widgetState ?? DefWidgetState();
+    var view = widgetState.buildEmpty();
     switch (done.state) {
       case DoneState.none:
-        view = widget.noneView ?? _buildEmpty(context);
+        view = widgetState.buildNone();
         break;
       case DoneState.waiting:
-        view = widget.waitingView ?? _buildEmpty(context);
+        view = widgetState.buildWaiting();
         break;
       case DoneState.error:
-        view = widget.errorView ?? _buildEmpty(context);
+        view = widgetState.buildError();
         break;
       case DoneState.empty:
-        view = widget.emptyView ?? _buildEmpty(context);
+        view = widgetState.buildEmpty();
         break;
       default:
         view = widget.dataView;
@@ -103,34 +104,6 @@ class _NetStateViewState extends State<NetStateView> {
     return view;
   }
 
-  _buildEmpty(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      color: Colors.white,
-      padding: EdgeInsets.all(16),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            child: Icon(
-              Icons.hourglass_empty,
-              color: Colors.grey,
-              size: 100,
-            ),
-          ),
-          Container(
-            child: Text(
-              "暂无数据",
-              style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                  fontWeight: FontWeight.normal),
-            ),
-          )
-        ],
-      ),
-    );
-  }
 }
 
 class NetStateViewNotifier extends ValueNotifier<Done> {
