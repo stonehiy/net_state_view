@@ -2,15 +2,14 @@ library net_state_view;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:net_state_view/widgets/def_widget_state.dart';
 
-import 'widgets/iwidget_state.dart';
+
 
 ///
 ///自定义状态布局
 ///```
 ///StateView(
-///      Container(
+///      dataView:Container(
 ///        color: whiteColor,
 ///      ),
 ///      controller: StateViewController(),
@@ -23,16 +22,18 @@ class NetStateView extends StatefulWidget {
 
   NetStateViewController controller = NetStateViewController.defalut();
 
-  // final Widget? noneView;
-  // final Widget? waitingView;
-  // final Widget? errorView;
-  // final Widget? emptyView;
-  final IWidgetState? widgetState;
+  final Widget? noneView;
+  final Widget? waitingView;
+  final Widget? errorView;
+  final Widget? emptyView;
 
   NetStateView({
     required this.dataView,
     required this.controller,
-    this.widgetState,
+    this.noneView,
+    this.waitingView,
+    this.errorView,
+    this.emptyView,
   });
 
   @override
@@ -82,20 +83,19 @@ class _NetStateViewState extends State<NetStateView> {
   }
 
   _rootView(BuildContext context, Done done) {
-    IWidgetState widgetState = widget.widgetState ?? DefWidgetState();
-    var view = widgetState.buildEmpty();
+    var view = widget.emptyView ?? _buildEmpty();
     switch (done.state) {
       case DoneState.none:
-        view = widgetState.buildNone();
+        view = widget.noneView ?? _buildEmpty();
         break;
       case DoneState.waiting:
-        view = widgetState.buildWaiting();
+        view = widget.waitingView ?? _buildWaiting();
         break;
       case DoneState.error:
-        view = widgetState.buildError();
+        view = widget.errorView ?? _buildError();
         break;
       case DoneState.empty:
-        view = widgetState.buildEmpty();
+        view = widget.emptyView ?? _buildEmpty();
         break;
       default:
         view = widget.dataView;
@@ -104,6 +104,93 @@ class _NetStateViewState extends State<NetStateView> {
     return view;
   }
 
+  _buildError() {
+    return Container(
+      alignment: Alignment.center,
+      color: Colors.white,
+      padding: EdgeInsets.all(16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            child: Icon(
+              Icons.error,
+              color: Colors.redAccent,
+              size: 100,
+            ),
+          ),
+          Container(
+            child: Text(
+              "error",
+              style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  _buildEmpty() {
+    return Container(
+      alignment: Alignment.center,
+      color: Colors.white,
+      padding: EdgeInsets.all(16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            child: Icon(
+              Icons.hourglass_empty,
+              color: Colors.grey,
+              size: 100,
+            ),
+          ),
+          Container(
+            child: Text(
+              "not date",
+              style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  _buildWaiting() {
+    return Container(
+      alignment: Alignment.center,
+      color: Colors.white,
+      padding: EdgeInsets.all(16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            child: CircularProgressIndicator(
+              strokeWidth: 4.0,
+              backgroundColor: Colors.white,
+              // value: 0.2,
+              valueColor: new AlwaysStoppedAnimation<Color>(Theme.of(context).accentColor),
+            ),
+          ),
+          Container(
+            child: Text(
+              "loading...",
+              style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal),
+            ),
+          )
+        ],
+      ),
+    );
+  }
 }
 
 class NetStateViewNotifier extends ValueNotifier<Done> {
